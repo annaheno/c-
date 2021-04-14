@@ -1,0 +1,48 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace ConsoleApp1
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            char ch = 'A';
+            Console.WriteLine(ch); // A
+
+            char ch1 = '\t'; // 안보임
+            char ch2 = 'T'; // T
+            char ch3 = '\n'; //안보임
+            char ch4 = 'O'; // O
+
+            Console.WriteLine(ch1);
+            Console.WriteLine(ch2);
+            Console.WriteLine(ch3);
+            Console.WriteLine(ch4);
+
+            char ch5 = '\u2023';
+            Console.WriteLine(ch5);
+
+            char ch6 = '\\';
+            Console.WriteLine(ch6);
+
+            string text = "Hello World";
+            Console.WriteLine(text);
+
+            string text2 = "\"Hello World\"";
+            Console.WriteLine(text2); //따옴표도 같이 나옴
+
+            string text3 = "\tHello\nWorld";
+            Console.WriteLine(text3); // 띄워져서 나옴
+
+            string text4 = @"\tHello\nWorld";
+            Console.WriteLine(text4); // @붙여서 그대로 나옴
+
+            string text5 = "Hello";
+            Console.WriteLine(text5 + " " + "World");
+        }
+    }
+}
