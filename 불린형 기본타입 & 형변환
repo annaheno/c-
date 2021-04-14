@@ -1,0 +1,31 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace ConsoleApp1
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            bool isNumeric = false;
+            Console.WriteLine(isNumeric); // false
+
+            byte b = 250;
+            short s = b;
+            Console.WriteLine(s); // 암시적 변환 : 작은 것을 더 큰 물로 보내는 것 (작은것>큰것 : O , 큰것>작은것 : X)
+
+            ushort u = 65;
+            char c = (char)u;
+            Console.WriteLine(c); // A (정수에서 문자로 변환)
+            // 명시적 변환 : 안되는 것을 되는 것으로 변환
+
+            int n = 40000;
+            short a = (short)n;
+            Console.WriteLine(a); // -25536
+
+        }
+    }
+}
