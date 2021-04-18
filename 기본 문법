@@ -1,0 +1,7 @@
+예약어 또는 키워드는 C# 언어에서 문법을 표현하기 위해 미리 예약된 단어를 의미한다.
+예를 들어, 이미 이전 장에서 다음과 같은 예약어를 배웠다.
+
+-sbyte, byte, ushort, int , uint, long, ulong
+-float, double, decimal
+-char, string
+-bool
