@@ -1,0 +1,105 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+namespace HelloCSharpWin
+{
+    public partial class Calculator : Form
+    {
+        public int Result = 0; // 최종 결과가 저장되는 변수
+        public bool isNewNum = true; 
+        // isNewNum가 true일 경우 현재 스크린에 있는 숫자를 유지하는게 아니라 새로운 숫자로 업데이트 된다
+        // 더하기버튼을 클릭하는 순간 현재 숫자가 완성이 되고 새로운 숫자를 입력받는다.
+
+        public Calculator()
+        {
+            InitializeComponent();
+        }
+
+        public int Add(int number1, int number2)
+        {
+            // float 실수형 데이터타입
+
+            int sum = number1 + number2;
+            return sum; // sum을 반환해준다
+        }
+
+        public float Add(float number1, float number2)
+        {
+            float sum = number1 + number2;
+            return sum;
+        }
+
+        public int Sub(int number1, int number2)
+        {
+            int sub = number1 - number2;
+            return sub;
+
+        }
+
+        private void NumButton1_Click(object sender, EventArgs e)
+        {
+            // 숫자 입력
+            // 더하기 버튼 > 숫자 완성, 변수와 숫자 합, 결과를 변수에 다시 저장 - 반복 -
+
+            
+
+            SetNum("1");
+
+
+            // if (NumScreen.Text == "0")
+            // NumScreen.Text = "1";
+            // "1"버튼을 클릭했을 때 스크린에 0 이 있으면 1을 나타내라
+
+            // else
+            //    NumScreen.Text = NumScreen.Text + "1";
+            // (기존에 있던 숫자를 버리지 않고) 스크린에 숫자 "1"이 표시되게 해라 = 1을 무한하게 나타내라
+        }
+
+        private void NumButton2_Click(object sender, EventArgs e)
+        {
+            SetNum("2");
+        }
+
+        public void SetNum(string num)
+        {
+            if (isNewNum) // 새로운 숫자의 시작이다
+            {
+                NumScreen.Text = num; // 그럼 스크린에 1을 적어라
+                isNewNum = false; // 새로운 시작이 아니다
+            }
+            else // 새로운 시작이다
+            {
+                if (NumScreen.Text == "0") // 스크린상의 숫자가 0이냐
+                {
+                    NumScreen.Text = num; // 그렇다. 그러면 num을 나타내라
+
+                }
+                else if (NumScreen.Text == "0") // 아니다 기존의 숫자에 숫자 num을 붙여라
+                {
+                    NumScreen.Text = num;
+                }
+
+                else
+                {
+                    NumScreen.Text = NumScreen.Text + num;
+                }
+            }
+        }
+
+        private void NumPlus_Click(object sender, EventArgs e)
+        {
+            int num = int.Parse(NumScreen.Text);
+            Result = Result + num;
+
+            NumScreen.Text = Result.ToString();
+            isNewNum = true; // 이제부터 새로운 숫자를 입력받아라
+        }
+    }
+}
