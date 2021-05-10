@@ -1,0 +1,185 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Windows.Forms;
+
+namespace WindowsFormsApp7
+{
+    public partial class Form1 : Form
+    {
+        public Form1()
+        {
+            InitializeComponent();
+            isChecked(checkBox2.Checked);
+
+            DataTable table = new DataTable();
+
+            table.Columns.Add("ID", typeof(string));
+            table.Columns.Add("제목", typeof(string));
+            table.Columns.Add("구분", typeof(string));
+            table.Columns.Add("생성일", typeof(string));
+            table.Columns.Add("수정일", typeof(string));
+
+            table.Rows.Add("ID 1", "제목 1번", "사용 중", "2019/03/11", "2019/03/18");
+            table.Rows.Add("ID 2", "제목 2번", "미사용", "2019/03/11", "2019/03/18");
+            table.Rows.Add("ID 3", "제목 3번", "미사용", "2019/03/11", "2019/03/18");
+            table.Rows.Add("ID 4", "제목 4번", "사용 중", "2019/03/11", "2019/03/18");
+
+            dataGridView_Excel.DataSource = table;
+
+            List<string> list = new List<string>();
+            list.Add("1");
+            list.Add("2");
+            list.Add("3");
+
+            //OpenFileDialog openFileDialog = new OpenFileDialog();
+            //openFileDialog.ShowDialog();
+            //string a = openFileDialog.FileName;
+            //DialogResult dialogResult = openFileDialog.ShowDialog();
+
+            List<string> list2 = new List<string>();
+
+            list2.Add("사과");
+            list2.Add("귤");
+            list2.Add("오렌지");
+            list2.Add("파인애플");
+            list2.Add("애플망고");
+
+            int idx = list2.FindIndex(a => a.Contains("파인애플"));
+
+            MessageBox.Show(idx.ToString());
+
+
+            
+
+
+        }
+
+        private void dataGridView_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+            //string aaa = dataGridView.Rows[e.RowIndex].Cells[3].Value.ToString();
+            //MessageBox.Show(aaa);
+        }
+
+        private void dataGridView_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            //string aaa = dataGridView.Rows[e.RowIndex].Cells[e.ColumnIndex].Value.ToString();
+            //textBox1.Text = aaa;
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            string bbb = textBox1.Text;
+            
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            
+        }
+
+        private void Form1_Shown(object sender, EventArgs e)
+        {
+            
+        }
+
+        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            string a = comboBox1.SelectedItem.ToString();
+            MessageBox.Show(a);
+        }
+
+        private void tabControl1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            comboBox1.Items.Clear();
+
+            if (tabControl1.SelectedIndex == 0)
+            {
+                comboBox1.Items.Add("11");
+                comboBox1.Items.Add("22");
+                comboBox1.Items.Add("33");
+            }
+            else
+            {
+                comboBox1.Items.Add("0");
+                comboBox1.Items.Add("01");
+                comboBox1.Items.Add("03");
+            }
+        }
+
+        private void dataGridView_Excel_CellMouseClick(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            if(e.Button == MouseButtons.Right)
+            {
+                contextMenuStrip1.Show();
+            }
+        }
+
+        private void toolStripMenuItem3_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("ddd");
+        }
+
+        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        {
+            if (checkBox1.Checked)
+            {
+                textBox1.Visible = true;
+            }
+            else
+            {
+                textBox1.Visible = false;
+            }
+        }
+
+        private void radioButton1_CheckedChanged(object sender, EventArgs e)
+        {
+            textBox1.Text = radioButton1.Text;
+        }
+
+        private void radioButton2_CheckedChanged(object sender, EventArgs e)
+        {
+            textBox1.Text = radioButton2.Text;
+        }
+
+        private void radioButton3_CheckedChanged(object sender, EventArgs e)
+        {
+            textBox1.Text = radioButton3.Text;
+
+        }
+
+        private void checkBox2_CheckedChanged(object sender, EventArgs e)
+        {
+            isChecked(checkBox2.Checked);
+        }
+
+        public void isChecked(bool Checked)
+        {
+            if(Checked)
+            {
+                button2.Enabled = true;
+                textBox2.Text = "체크 되어있음";
+
+            }
+            else
+            {
+                button2.Enabled = false;
+                textBox2.Text = "체크 X";
+            }
+
+            List<string> bbb = getList(textBox2.Text);
+        }
+
+        public List<string> getList(string a)
+        {
+            List<string> aaaaa = new List<string>();
+
+            return aaaaa;
+
+        }
+    }
+}
