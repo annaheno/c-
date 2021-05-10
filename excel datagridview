@@ -1,0 +1,64 @@
+        // Excel -> DataTable 버튼
+        private void btnCsv2DataTable_Click(object sender, EventArgs e)
+        {
+            // 가상의 테이블을 만듦
+            DataTable dt = new DataTable();
+            try
+            {
+                using (OpenFileDialog dlg = new OpenFileDialog()) // 파일 탐색기
+                {
+                    dlg.Filter = "Excel Files(2007이상)|*.xlsx|Excel Files(97~2003)|*.xls";
+                    dlg.FilterIndex = 2;
+                    dlg.InitialDirectory = @"C:\Users\nomame-0929\Desktop\새 폴더";
+
+                    Excel.Application objExcelApp = new Excel.Application();
+
+                    if (dlg.ShowDialog() == DialogResult.OK) // 탐색기를 열어서 확인울 눌렀을 때
+                    {
+                        Excel.Workbook wkBook = objExcelApp.Workbooks.Open(dlg.FileName); // 엑셀 파일
+                        Excel.Worksheet wkSheet = (Excel.Worksheet)wkBook.Worksheets.Item[1]; // 시트
+                        Excel.Range range = wkSheet.UsedRange; // 범위
+
+                        object[,] arr = (object[,])range.Value;
+
+                        int cols = range.Columns.Count; // 선택한 범위의 열 갯수
+                        int rows = range.Rows.Count; // 선택한 범위의 행 갯수
+
+                        for (int i = 1; i <= cols; i++) // 컬럼의 갯수 만큼 반복
+                        {
+                            dt.Columns.Add(arr[1, i].ToString(), typeof(string)); // 테이블에 컬럼 부분을 먼저 추가 (arr[로우, 컬럼] < string(문자열)로 넣겠다)
+                        }
+
+                        for (int j = 2; j <= rows; j++) // 테이블에 새로운 행을 만든다
+                        {
+                            DataRow newRow = dt.NewRow();
+                            for (int z = 0; z < cols; z++) 
+                            {
+                                if (arr[j, z + 1] != null) // 비어있지 않을 때
+                                {
+                                    newRow[z] = arr[j, z + 1].ToString(); // 행에 값을 추가한다
+                                }
+                                else // 비어 있으면 공백으로 두겠다
+                                {
+                                    newRow[z] = "";
+                                }
+                            }
+
+                            dt.Rows.Add(newRow); // 가상 테이블에 한줄씩 추가
+                        }
+                        dataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+                        dataGridView1.AlternatingRowsDefaultCellStyle.BackColor = Color.LightYellow;
+                        dataGridView1.DataSource = dt; // 그리드뷰에 가상테이블을 넣는다
+
+
+                        wkBook.Close();
+                        objExcelApp.Quit();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            lbCoaming.Text = "Coaming Q'ty : " + dataGridView1.Rows.Count.ToString();
+        }
