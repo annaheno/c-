@@ -1,0 +1,151 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Windows.Forms;
+
+namespace WindowsFormsApp7
+{
+    public partial class Form2 : Form
+    {
+        public bool m_bEtrance = true;
+
+        public Form2()
+        {
+            InitializeComponent();
+            /*
+            string sub = "ABCDEF";
+            //MessageBox.Show(sub.Substring(0,2));
+            //MessageBox.Show(sub.Substring(1));
+
+            string txt = "ABC DE F";
+            char sp = ' ';
+            string[] spstring = txt.Split(sp);
+
+            for (int i = 0; i < spstring.Length; i++)
+            {
+                // MessageBox.Show(spstring[i]);
+            }
+             
+
+            string txt = "ABCDEF";
+            string search = "C";
+
+            MessageBox.Show(txt.IndexOf(search).ToString());
+            */
+
+            int[] arr = { 1, 2, 3 };
+
+            try
+            {
+                for (int i = 0; i < 5; i++)
+                {
+                    MessageBox.Show(arr[i].ToString());
+
+                }
+            }
+            catch (IndexOutOfRangeException e)
+            {
+               // MessageBox.Show(e.Message);
+            }
+            {
+
+                
+            }
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            DialogResult dialogResult = MessageBox.Show("Message OK, Cancel Test?", "Inform", MessageBoxButtons.OKCancel, MessageBoxIcon.Information);
+
+            if(dialogResult == DialogResult.OK)
+            {
+                MessageBox.Show("OK", "Inform", MessageBoxButtons.OKCancel, MessageBoxIcon.Information);
+            }
+            else if (dialogResult == DialogResult.Cancel)
+            {
+                MessageBox.Show("Cancel", "Inform", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
+
+            }
+        }
+
+        private void treeView1_AfterSelect(object sender, TreeViewEventArgs e)
+        {
+
+        }
+
+        private void Form2_Load(object sender, EventArgs e)
+        {
+            SetTreeViewData();
+        }
+
+        public void SetTreeViewData()
+        {
+            tv_viewer.CheckBoxes = true;
+
+            tv_viewer.Nodes.Add("과일");
+
+            tv_viewer.Nodes[0].Nodes.Add("바나나");
+            tv_viewer.Nodes[0].Nodes.Add("키위");
+            tv_viewer.Nodes[0].Nodes.Add("사과");
+            tv_viewer.Nodes[0].Nodes.Add("블루베리");
+            tv_viewer.Nodes[0].Nodes.Add("딸기");
+            tv_viewer.Nodes[0].Nodes.Add("체리");
+            tv_viewer.Nodes[0].Nodes.Add("앵두");
+
+            tv_viewer.Nodes.Add("직업");
+
+            tv_viewer.Nodes[1].Nodes.Add("프로그래머");
+            tv_viewer.Nodes[1].Nodes.Add("공무원");
+            tv_viewer.Nodes[1].Nodes.Add("국회의원");
+            tv_viewer.Nodes[1].Nodes.Add("선생님");
+            tv_viewer.Nodes[1].Nodes.Add("생산직");
+        }
+
+        private void tv_viewer_AfterCheck(object sender, TreeViewEventArgs e)
+        {
+            if (m_bEtrance)
+            {
+                m_bEtrance = false;
+                ChildTreeNodeCheck(e.Node, e.Node.Checked);
+                ParentTreeNodeCheck(e.Node, e.Node.Checked);
+                m_bEtrance = true;
+            }
+        }
+
+        private void ParentTreeNodeCheck(TreeNode node, bool Checked)
+        {
+            if (node.Parent == null)
+            {
+                return;
+            }
+
+            bool bNodesAllChecks = true;
+
+            foreach(TreeNode childNode in node.Parent.Nodes)
+            {
+                if (childNode.Checked == false)
+                {
+                    bNodesAllChecks = false;
+                    break;
+                }
+            }
+            node.Parent.Checked = bNodesAllChecks;
+            ParentTreeNodeCheck(node.Parent, bNodesAllChecks);
+        }
+
+        private void ChildTreeNodeCheck(TreeNode node, bool Checked)
+        {
+            foreach (TreeNode childNode in node.Nodes)
+            {
+                ChildTreeNodeCheck(childNode, Checked);
+            }
+            node.Checked = Checked;
+        }
+
+
+    }
+}
