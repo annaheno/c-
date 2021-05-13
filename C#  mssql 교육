@@ -1,0 +1,146 @@
+using System;
+using System.Data;
+using System.Data.SqlClient;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Windows.Forms;
+
+namespace SqlTest
+{
+    public partial class sql_Form : Form
+    {
+        // SqlConnection, SqlCommand, SqlDataAdapter 객체 생성
+        SqlConnection conn;
+        SqlCommand cmd;
+        SqlDataAdapter da;
+
+        // DataSet 객채 생성
+        DataSet ds;
+        DataTable dt;
+
+        public sql_Form()
+        {
+            InitializeComponent();
+
+            //MSSQL 데이터베이스 연결
+            string ConnectionString = "Server=DESKTOP-VSUO7QQ\\SQLEXPRESS; Database = Test; uid = sa; pwd = 1234";
+            conn = new SqlConnection(ConnectionString);
+            conn.Open();
+
+            // MessageBox.Show("데이터베이스 연결이 정상적으로 완료되었습니다.");
+
+            //MSSQL 명령어 지정
+            cmd = new SqlCommand();
+            cmd.Connection = conn;
+
+
+            // 데이타그리드뷰 자동 사이즈 조절 (꽉차게)
+            dataGridView_SQL.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+
+            //행 전체 선택
+            dataGridView_SQL.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+
+
+        }
+
+        private void SelectBtn_Click(object sender, EventArgs e)
+        {
+            sql_Form_Load(null, null);
+        }
+
+        // 폼을 띄웠을 때 이벤트
+        private void sql_Form_Load(object sender, EventArgs e)
+        {
+            // SELECT (employee 테이블에서 empNo, empName, job, salary, (salary * 12)를 조회한다
+            cmd.CommandText = "SELECT empNo 사원번호, empName 사원이름, job 직급, salary 월급, salary * 12 연봉 FROM employee";
+
+            // 데이타그리드뷰에 나타내줌
+            da = new SqlDataAdapter(cmd);
+            dt = new DataTable();
+            da.Fill(dt); // .Fill() 채워준다
+            dataGridView_SQL.DataSource = dt.DefaultView;
+        }
+
+        // 셀을 클릭했을 때
+        private void dataGridView_SQL_CellClick(object sender, DataGridViewCellEventArgs e) 
+        {
+            int rowIndex = dataGridView_SQL.CurrentCell.RowIndex; // rowIndex = 데이타그리드뷰에서 지금 선택된 셀의 행번호
+        }
+
+        private void SearchBtn_Click(object sender, EventArgs e)
+        {
+            if (txtNo.TextLength != 4) // 입력한 번호의 길이가 네자리가 아닐 시에
+            {
+                MessageBox.Show("입력하신 정보가 존재하지 않습니다."); // 메세지 띄우고
+                return; // 리턴
+            }
+
+
+                cmd.CommandText = "SELECT empNo 사원번호, empName 사원이름, job 직급, salary 월급, salary * 12 연봉"
+                                + " FROM employee WHERE empNo=" + txtNo.Text;
+
+        // 입력한 번호의 사원번호를 검색하면 그 번호의 칼럼들이 조회 됨
+
+            da = new SqlDataAdapter(cmd);
+            dt = new DataTable();
+            da.Fill(dt);
+
+            dataGridView_SQL.DataSource = dt.DefaultView;
+        }
+
+        //삭제 버튼을 눌렀을 때
+        private void DeleteBtn_Click(object sender, EventArgs e)
+        {
+            int rowIndex = dataGridView_SQL.CurrentCell.RowIndex;
+
+            if (dataGridView_SQL.SelectedRows.Count == 0) // 선택된게 없을 때
+                return;
+
+
+            string sempNo = dataGridView_SQL.CurrentRow.Cells["사원번호"].Value.ToString();
+
+                cmd.CommandText = "DELETE FROM employee WHERE empNo =" + sempNo;
+            // 선택된 셀의 내용을 모두 지운다
+
+                da = new SqlDataAdapter(cmd);
+                dt = new DataTable();
+                da.Fill(dt);
+                
+            MessageBox.Show("삭제완료");
+
+            dataGridView_SQL.Rows.RemoveAt(rowIndex); 
+        }
+
+        private void UpdateBtn_Click(object sender, EventArgs e)
+        {
+            int index = dataGridView_SQL.CurrentRow.Index;
+
+            string empNo = dataGridView_SQL["사원번호", index].Value.ToString();
+            string empName = dataGridView_SQL["사원이름", index].Value.ToString();
+            string job = dataGridView_SQL["직급", index].Value.ToString();
+            string salary = dataGridView_SQL["월급", index].Value.ToString();
+            string salary_year = dataGridView_SQL["연봉", index].Value.ToString();
+
+            cmd.CommandText = "UPDATE Employee SET empName='"+ empName +"', job='"+ job +"', salary='"+ salary +"' WHERE empNo='"+ empNo +"'";
+            cmd.ExecuteNonQuery();
+        }
+
+        private void btnInsert_Click(object sender, EventArgs e)
+        {
+            int index = dataGridView_SQL.CurrentRow.Index;
+            string empNo = dataGridView_SQL["사원번호", index].Value.ToString();
+            string empName = dataGridView_SQL["사원이름", index].Value.ToString();
+            string job = dataGridView_SQL["직급", index].Value.ToString();
+            string salary = dataGridView_SQL["월급", index].Value.ToString();
+            string salary_year = dataGridView_SQL["연봉", index].Value.ToString();
+
+                 cmd.CommandText = "INSERT INTO employee (empNo, empName, job,salary) values" +
+                " ('" + empNo + "', '" + empName + "', '" + job + "', '" + salary + "')";
+            cmd.ExecuteNonQuery();
+        }
+    }
+}
