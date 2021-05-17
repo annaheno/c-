@@ -1,0 +1,192 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Data.SqlClient;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using Application = Microsoft.Office.Interop.Excel.Application;
+using Excel = Microsoft.Office.Interop.Excel;
+
+namespace SqlTest3
+{
+    public partial class Form1 : Form
+    {
+        SqlConnection conn = new SqlConnection();
+        SqlCommand cmd = new SqlCommand();
+
+        public Form1()
+        {
+            InitializeComponent();
+        }
+
+        private void btnFileLoad_Click(object sender, EventArgs e)
+        {
+            DataTable dt = new DataTable(); // 데이터 테이블 dt 선언
+            try
+            {
+                using (OpenFileDialog dlg = new OpenFileDialog()) // 파일 탐색기 열기
+                {
+                    dlg.Filter = "Excel Files(2007이상)|*.xlsx|Excel Files(97~2003)|*.xls"; // 파일 유형 지정
+                    dlg.FilterIndex = 2; // 파일 유형 중 두번째꺼로 기본 선택하겠다
+                    dlg.InitialDirectory = @"C:\Users\nomame-0929\Desktop\새 폴더"; // 디폴트로 열릴 폴더 경로 지정
+
+                    Excel.Application objExcelApp = new Excel.Application(); // 엑셀 사용하겠다
+
+                    if (dlg.ShowDialog() == DialogResult.OK) // 탐색기에서 파일을 열었을(선택했을) 때
+                    {
+                        Excel.Workbook wkBook = objExcelApp.Workbooks.Open(dlg.FileName); // 엑셀 파일 자체
+                        Excel.Worksheet wkSheet = (Excel.Worksheet)wkBook.Worksheets.Item[1]; // 시트
+                        Excel.Range range = wkSheet.UsedRange; // 범위
+
+                        object[,] arr = (object[,])range.Value; // 행열 값 넣을 배열 공간 만들기
+
+                        int cols = range.Columns.Count; // 선택한 범위의 열 갯수
+                        int rows = range.Rows.Count; // 선택한 범위의 행 갯수
+
+                        for (int i = 1; i <= cols; i++) // 컬럼의 갯수만큼 반복하겠다
+                        {
+                            dt.Columns.Add(arr[1, i].ToString(), typeof(string)); // string 타입으로 컬럼 첫번째에 넣겠다
+                        }
+
+                        for (int j = 2; j <= rows; j++) // 테이블에 새로운 행 넣기 (위에서 행으로 첫번째는 채워졌으니까 2부터 시작)
+                        {
+                            DataRow newRow = dt.NewRow();
+
+                            for (int z = 0; z < cols; z++)
+                            {
+                                if (arr[j, z + 1] != null) // 비어있지 않을 때 , 값이 있을 때
+                                {
+                                    newRow[z] = arr[j, z + 1].ToString(); // 행 공간을 하나씩 추가해줌
+                                }
+                                else
+                                {
+                                    newRow[z] = ""; // 비어있으면 공백으로 처리
+                                }
+                            }
+                            dt.Rows.Add(newRow); // 행 추가
+                        }
+                        dgvExcelDataView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+                        dgvExcelDataView.AlternatingRowsDefaultCellStyle.BackColor = Color.White;
+                        dgvExcelDataView.DataSource = dt;
+
+                        wkBook.Close();
+                        objExcelApp.Quit();
+                    }
+                }
+            }
+            catch (Exception)
+            {
+            }
+        }
+
+        private bool DBConnection()
+        {
+            bool bResult = true;
+
+            try
+            {
+                // mssql 연결
+                string ConnectionString = "Server=DESKTOP-VSUO7QQ\\SQLEXPRESS; Database = TEST; uid = sa; pwd = 1234";
+                conn = new SqlConnection(ConnectionString);
+                // 실행
+                conn.Open();
+
+                cmd = new SqlCommand();
+                cmd.Connection = conn;
+
+            }
+            catch (Exception ex)
+            {
+                bResult = false;
+                MessageBox.Show(ex.Message, "데이터베이스 연결을 실패했습니다",MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            return bResult;
+}
+
+        private void btnDataUpload_Click(object sender, EventArgs e)
+        {
+            try
+            {
+               // DataTable dtChanges = new DataTable(); // 테이블 생성
+
+                DataTable dtProcessFlag = (DataTable)this.dgvExcelDataView.DataSource; // 데이터그리드뷰에 있는 테이블
+                if (dtProcessFlag != null) // 테이블이 비어있지 않을 때
+                {
+                    try
+                    {
+                        DBConnection();
+                        // dtProcessFlag = dtProcessFlag.GetChanges(DataRowState.Added); // DataRowState 데이터를 추가한 것을 가져오겠다
+
+                        for (int i = 0; i < dtProcessFlag.Rows.Count; i++) // 위에 했던 것 처럼 테이블 행 값 넣는 것을 반복
+                        {
+                            // 쿼리 : 행에 값 추가
+                            cmd.CommandText = "INSERT INTO TB_PROJ_TEST (TRANSIT_NO, CABLE_NO, TRANSIT_TYPE,"
+                                                + " CABLE_OD, CABLE_QTY, BLOCK, AREA, PROJ, TYPE,MARGIN, CABLE_TYPE, WEIGHT, REV) VALUES ('"
+                                                + dtProcessFlag.Rows[i][0].ToString() + "', '"
+                                                + dtProcessFlag.Rows[i][1].ToString() + "', '"
+                                                + dtProcessFlag.Rows[i][2].ToString() + "',  "
+                                                + dtProcessFlag.Rows[i][3].ToString() + " ,  "
+                                                + dtProcessFlag.Rows[i][4].ToString() + " , '"
+                                                + dtProcessFlag.Rows[i][5].ToString() + "', '"
+                                                + dtProcessFlag.Rows[i][6].ToString() + "', '"
+                                                + dtProcessFlag.Rows[i][7].ToString() + "',  "
+                                                + "NULL, NULL, NULL, NULL, NULL)";
+                            cmd.ExecuteNonQuery();
+                        }
+                        MessageBox.Show("데이터베이스에 데이터 추가하였습니다.");
+                        // 쿼리 : 아까 만든 행 보여줘
+                        cmd.CommandText = "SELECT TRANSIT_NO, CABLE_NO, TRANSIT_TYPE, CABLE_OD, CABLE_QTY, BLOCK, AREA, PROJ FROM TB_PROJ_TEST";
+
+                        SqlDataAdapter da = new SqlDataAdapter(cmd);
+                        DataTable dt = new DataTable();
+                        da.Fill(dt);
+
+                        // 폼 데이터그리드뷰에 나타내기
+                        dgvExcelDataView.DataSource = dt.DefaultView;
+                        dgvExcelDataView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+                        dgvExcelDataView.AlternatingRowsDefaultCellStyle.BackColor = Color.LightCyan;
+
+                        conn.Close();
+                        conn.Dispose();
+                    }
+                    catch (Exception ex)
+                    {
+
+                    }
+                    MessageBox.Show("데이터베이스에 데이터 추가하였습니다.");
+                }
+            }
+            catch (Exception)
+            {
+            }
+        }
+
+        private void btnDataSearch_Click(object sender, EventArgs e)
+        {
+
+            try
+            {
+                DBConnection();
+
+                cmd.CommandText = "SELECT TRANSIT_NO, CABLE_NO, TRANSIT_TYPE, CABLE_OD, CABLE_QTY, BLOCK, AREA, PROJ FROM TB_PROJ_TEST";
+                SqlDataAdapter da = new SqlDataAdapter(cmd);
+                DataTable dt = new DataTable();
+                da.Fill(dt);
+
+                dgvExcelDataView.DataSource = dt.DefaultView;
+                dgvExcelDataView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+                dgvExcelDataView.AlternatingRowsDefaultCellStyle.BackColor = Color.LightCyan;
+                this.conn.Close();
+                this.conn.Dispose();
+            }
+            catch (Exception ex)
+            {
+            }
+
+        }
+    }
+}
